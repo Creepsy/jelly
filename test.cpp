@@ -5,7 +5,7 @@
 
 int main() {
     std::ifstream test{};
-    test.open("test_file.jly");
+    test.open("test_file.jelly");
 
     if(!test.is_open()) return -1;
 

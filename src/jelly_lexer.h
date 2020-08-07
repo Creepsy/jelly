@@ -4,10 +4,22 @@
 
 namespace jelly {
     const std::vector<std::string> tokenToString = {
+        "NUMBER",
+        "MULTIPLY",
+        "DIVIDE",
+        "ADD",
+        "SUBSTRACT",
+        "MODULO",
         "END OF FILE"
     };
 
     enum tokenType {
+        NUMBER,
+        MULTIPLY,
+        DIVIDE,
+        ADD,
+        SUBSTRACT,
+        MODULO,
         END
     };
 
@@ -25,6 +37,8 @@ namespace jelly {
 
         size_t line;
         size_t character;
+
+        token next_number(const char curr);
     public:
         jelly_lexer(std::istream& input);
         token next_token();
