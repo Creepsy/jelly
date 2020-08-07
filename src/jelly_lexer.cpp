@@ -20,7 +20,7 @@ jelly::token jelly::jelly_lexer::next_token() {
             }
         }
 
-        if(std::isdigit(next)) return this -> next_number(next);
+        if(std::isdigit(next) || next == '.') return this -> next_number(next);
 
         if(next == '*') {
             return token{tokenType::MULTIPLY, "*", this -> line, this -> character - 1, this -> character};
@@ -47,10 +47,19 @@ jelly::token jelly::jelly_lexer::next_number(const char curr) {
     char next = this -> input.get();
     this -> character++;
 
+    if(curr == '.' && !std::isdigit(next)) {
+        this -> input.seekg(-1, std::ios::cur);
+        this -> character--;
+
+        return token{tokenType::DOT, number, line, start, this -> character};
+    }
+
     bool is_float = false;
 
+    if(curr == '.') is_float = true;
+
     while(!this -> input.fail() && (std::isdigit(next) || next == '.')) {
-        if(is_float && next == '.') throw std::runtime_error("Number parse error at Ln " + std::to_string(line) + ", Col " + std::to_string(this -> character));
+        if(is_float && next == '.') throw std::runtime_error("Number parse error at Ln " + std::to_string(line) + ", Col " + std::to_string(this -> character - 1));
         if(next == '.') is_float = true;
         number.push_back(next);
 
@@ -61,7 +70,7 @@ jelly::token jelly::jelly_lexer::next_number(const char curr) {
     this -> input.seekg(-1, std::ios::cur);
     this -> character--;
 
-    return token{tokenType::NUMBER, number, line, start, this -> character};
+    return (is_float) ? token{tokenType::FLOAT, number, line, start, this -> character} : token{tokenType::INT, number, line, start, this -> character};
 }
 
 jelly::jelly_lexer::~jelly_lexer() {

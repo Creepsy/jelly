@@ -4,22 +4,26 @@
 
 namespace jelly {
     const std::vector<std::string> tokenToString = {
-        "NUMBER",
+        "FLOAT",
+        "INT",
         "MULTIPLY",
         "DIVIDE",
         "ADD",
         "SUBSTRACT",
         "MODULO",
+        "DOT",
         "END OF FILE"
     };
 
     enum tokenType {
-        NUMBER,
+        FLOAT,
+        INT,
         MULTIPLY,
         DIVIDE,
         ADD,
         SUBSTRACT,
         MODULO,
+        DOT,
         END
     };
 
