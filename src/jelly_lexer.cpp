@@ -47,12 +47,16 @@ jelly::token jelly::jelly_lexer::next_token() {
                 if(this -> input.fail()) throw std::runtime_error("Expected comment end \'##\', found EOF");
                 return this -> next_token();
             } else {
-                while(next != '\n') {
+                while(next != '\n' && !this -> input.fail()) {
                     next = this -> input.get();
                     this -> character++;
                 }
-                this -> character = 0;
-                this -> line++;
+                if(!this -> input.fail()) {
+                    this -> character = 0;
+                    this -> line++;
+                } else {
+                    return token{tokenType::END, "END", this -> line, this -> character - 1, this -> character};
+                }
                 return this -> next_token();
             }
         }
@@ -69,6 +73,30 @@ jelly::token jelly::jelly_lexer::next_token() {
             return token{tokenType::SUBSTRACT, "-", this -> line, this -> character - 1, this -> character};
         } else if(next == '%') {
             return token{tokenType::MODULO, "%", this -> line, this -> character - 1, this -> character};
+        } else if(next == ';') {
+            return token{tokenType::EOL, ";", this -> line, this -> character - 1, this -> character};
+        } else if(next == '(') {
+            return token{tokenType::O_BRACKET, "(", this -> line, this -> character - 1, this -> character};
+        } else if(next == ')') {
+            return token{tokenType::C_BRACKET, ")", this -> line, this -> character - 1, this -> character};
+        } else if(next == '{') {
+            return token{tokenType::O_BRACE, "{", this -> line, this -> character - 1, this -> character};
+        } else if(next == '}') {
+            return token{tokenType::C_BRACE, "}", this -> line, this -> character - 1, this -> character};
+        } else if(next == '[') {
+            return token{tokenType::O_S_BRACKET, "[", this -> line, this -> character - 1, this -> character};
+        } else if(next == ']') {
+            return token{tokenType::C_S_BRACKET, "]", this -> line, this -> character - 1, this -> character};
+        } else if(next == '|') {
+            return token{tokenType::OR, "|", this -> line, this -> character - 1, this -> character};
+        } else if(next == '&') {
+            return token{tokenType::AND, "&", this -> line, this -> character - 1, this -> character};
+        } else if(next == ',') {
+            return token{tokenType::SEPARATOR, ",", this -> line, this -> character - 1, this -> character};
+        } else if(next == '"') {
+            return token{tokenType::QUOTE, "\"", this -> line, this -> character - 1, this -> character};
+        } else if(next == '=') {
+            return token{tokenType::ASSIGN, "=", this -> line, this -> character - 1, this -> character};
         }
     }
 

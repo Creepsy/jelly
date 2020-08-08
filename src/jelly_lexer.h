@@ -12,6 +12,18 @@ namespace jelly {
         "SUBSTRACT",
         "MODULO",
         "DOT",
+        "OPENING BRACKET",
+        "CLOSING BRACKET",
+        "OPENING BRACE",
+        "CLOSING BRACE",
+        "OPENING SQUARE BRACKET",
+        "CLOSING SQUARE BRACKET",
+        "OR",
+        "AND",
+        "SEPARATOR",
+        "QUOTE",
+        "ASSIGN",
+        "END OF LINE",
         "END OF FILE"
     };
 
@@ -24,6 +36,18 @@ namespace jelly {
         SUBSTRACT,
         MODULO,
         DOT,
+        O_BRACKET,
+        C_BRACKET,
+        O_BRACE,
+        C_BRACE,
+        O_S_BRACKET,
+        C_S_BRACKET,
+        OR,
+        AND,
+        SEPARATOR,
+        QUOTE,
+        ASSIGN,
+        EOL,
         END
     };
 
