@@ -30,6 +30,26 @@ namespace jelly {
         "NOT_EQUALS",
         "GREATER_EQUALS",
         "SMALLER_EQUALS",
+        "IDENTIFIER",
+        "UNDEFINED",
+        "IF",
+        "ELSE",
+        "FOR",
+        "WHILE",
+        "FUNCTION",
+        "TYPE_INT",
+        "TYPE_FLOAT",
+        "TYPE_BOOL",
+        "TYPE_STRING",
+        "STRUCT",
+        "VOID",
+        "TRUE",
+        "FALSE",
+        "IMPORT",
+        "RETURN",
+        "BREAK",
+        "INCREASE",
+        "DECREASE",
         "END OF LINE",
         "END OF FILE"
     };
@@ -61,6 +81,26 @@ namespace jelly {
         NOT_EQUALS,
         GREATER_EQUALS,
         SMALLER_EQUALS,
+        IDENTIFIER,
+        UNDEFINED,
+        IF,
+        ELSE,
+        FOR,
+        WHILE,
+        FUNCTION,
+        TYPE_INT,
+        TYPE_FLOAT,
+        TYPE_BOOL,
+        TYPE_STRING,
+        STRUCT,
+        VOID,
+        TRUE,
+        FALSE,
+        IMPORT,
+        RETURN,
+        BREAK,
+        INCREASE,
+        DECREASE,
         EOL,
         END
     };
@@ -81,6 +121,7 @@ namespace jelly {
         size_t character;
 
         token next_number(const char curr);
+        tokenType check_keywords(const std::string& ident);
     public:
         jelly_lexer(std::istream& input);
         token next_token();

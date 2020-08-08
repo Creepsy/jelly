@@ -68,9 +68,25 @@ jelly::token jelly::jelly_lexer::next_token() {
         } else if(next == '/') {
             return token{tokenType::DIVIDE, "/", this -> line, this -> character - 1, this -> character};
         } else if(next == '+') {
-            return token{tokenType::ADD, "+", this -> line, this -> character - 1, this -> character};
+            next = this -> input.get();
+            this -> character++;
+            if(next == '+') {
+                return token{tokenType::INCREASE, "++", this -> line, this -> character - 2, this -> character};
+            } else {
+                this -> input.seekg(-1, std::ios::cur);
+                this -> character--;
+                return token{tokenType::ADD, "+", this -> line, this -> character - 1, this -> character};
+            }
         } else if(next == '-') {
-            return token{tokenType::SUBSTRACT, "-", this -> line, this -> character - 1, this -> character};
+            next = this -> input.get();
+            this -> character++;
+            if(next == '-') {
+                return token{tokenType::DECREASE, "--", this -> line, this -> character - 2, this -> character};
+            } else {
+                this -> input.seekg(-1, std::ios::cur);
+                this -> character--;
+                return token{tokenType::SUBSTRACT, "-", this -> line, this -> character - 1, this -> character};
+            }
         } else if(next == '%') {
             return token{tokenType::MODULO, "%", this -> line, this -> character - 1, this -> character};
         } else if(next == ';') {
@@ -138,6 +154,23 @@ jelly::token jelly::jelly_lexer::next_token() {
                 return token{tokenType::NOT, "!", this -> line, this -> character - 1, this -> character};
             }     
         }
+
+        if(std::isalpha(next) || next == '_') {
+            size_t start = this -> character - 1;
+            std::string ident;
+
+            while(std::isalnum(next) && !this -> input.fail() || next == '_') {
+                ident.push_back(next);
+                next = this -> input.get();
+                this -> character++;
+            }
+
+            this -> input.seekg(-1, std::ios::cur);
+            this -> character--;
+
+            return token{this -> check_keywords(ident), ident, this -> line, start, this -> character};
+        }
+        return token{tokenType::UNDEFINED, std::string(1, next), this -> line, this -> character - 1, this -> character};
     }
 
     return token{tokenType::END, "END", this -> line, this -> character - 1, this -> character};
@@ -176,6 +209,44 @@ jelly::token jelly::jelly_lexer::next_number(const char curr) {
     this -> character--;
 
     return (is_float) ? token{tokenType::FLOAT, number, line, start, this -> character} : token{tokenType::INT, number, line, start, this -> character};
+}
+
+jelly::tokenType jelly::jelly_lexer::check_keywords(const std::string& ident) {
+    if(ident == "if") {
+        return tokenType::IF;
+    } else if(ident == "else") {
+        return tokenType::ELSE;
+    } else if(ident == "for") {
+        return tokenType::FOR;
+    } else if(ident == "while") {
+        return tokenType::WHILE;
+    } else if(ident == "func") {
+        return tokenType::FUNCTION;
+    } else if(ident == "int") {
+        return tokenType::TYPE_INT;
+    } else if(ident == "float") {
+        return tokenType::TYPE_FLOAT;
+    } else if(ident == "bool") {
+        return tokenType::TYPE_BOOL;
+    } else if(ident == "string") {
+        return tokenType::TYPE_STRING;
+    } else if(ident == "struct") {
+        return tokenType::STRUCT;
+    } else if(ident == "void") {
+        return tokenType::VOID;
+    } else if(ident == "true") {
+        return tokenType::TRUE;
+    } else if(ident == "false") {
+        return tokenType::FALSE;
+    } else if(ident == "import") {
+        return tokenType::IMPORT;
+    } else if(ident == "return") {
+        return tokenType::RETURN;
+    } else if(ident == "break") {
+        return tokenType::BREAK;
+    }
+
+    return tokenType::IDENTIFIER;
 }
 
 jelly::jelly_lexer::~jelly_lexer() {
