@@ -20,6 +20,43 @@ jelly::token jelly::jelly_lexer::next_token() {
             }
         }
 
+        if(next == '#') {
+            next = this -> input.get();
+            bool multiline = (next == '#');
+            if(multiline) {
+                bool start_end = false;
+                while(!this -> input.fail()) {
+                    next = this -> input.get();
+                    this -> character++;
+
+                    if(next == '\n') {
+                        this -> character = 0;
+                        this -> line++;
+                    }
+
+                    if(next == '#'){
+                        if(start_end) {
+                            break;
+                        } else {
+                            start_end = true;
+                        }
+                    } else {
+                        if(start_end) start_end = false;
+                    }
+                }
+                if(this -> input.fail()) throw std::runtime_error("Expected comment end \'##\', found EOF");
+                return this -> next_token();
+            } else {
+                while(next != '\n') {
+                    next = this -> input.get();
+                    this -> character++;
+                }
+                this -> character = 0;
+                this -> line++;
+                return this -> next_token();
+            }
+        }
+
         if(std::isdigit(next) || next == '.') return this -> next_number(next);
 
         if(next == '*') {
