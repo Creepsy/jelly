@@ -23,6 +23,13 @@ namespace jelly {
         "SEPARATOR",
         "QUOTE",
         "ASSIGN",
+        "NOT",
+        "GREATER",
+        "SMALLER",
+        "EQUALS",
+        "NOT_EQUALS",
+        "GREATER_EQUALS",
+        "SMALLER_EQUALS",
         "END OF LINE",
         "END OF FILE"
     };
@@ -47,6 +54,13 @@ namespace jelly {
         SEPARATOR,
         QUOTE,
         ASSIGN,
+        NOT,
+        GREATER,
+        SMALLER,
+        EQUALS,
+        NOT_EQUALS,
+        GREATER_EQUALS,
+        SMALLER_EQUALS,
         EOL,
         END
     };

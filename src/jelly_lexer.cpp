@@ -96,7 +96,47 @@ jelly::token jelly::jelly_lexer::next_token() {
         } else if(next == '"') {
             return token{tokenType::QUOTE, "\"", this -> line, this -> character - 1, this -> character};
         } else if(next == '=') {
-            return token{tokenType::ASSIGN, "=", this -> line, this -> character - 1, this -> character};
+            next = this -> input.get();
+            this -> character++;
+            if(next == '=') {
+                return token{tokenType::EQUALS, "==", this -> line, this -> character - 2, this -> character};
+            } else {
+                this -> input.seekg(-1, std::ios::cur);
+                this -> character--;
+                return token{tokenType::ASSIGN, "=", this -> line, this -> character - 1, this -> character};
+            }
+        } else if(next == '>') {
+            next = this -> input.get();
+            this -> character++;
+            if(next == '=') {
+                return token{tokenType::GREATER_EQUALS, ">=", this -> line, this -> character - 2, this -> character};
+            } else {
+                this -> input.seekg(-1, std::ios::cur);
+                this -> character--;
+                return token{tokenType::GREATER, ">", this -> line, this -> character - 1, this -> character};
+            }
+            
+        } else if(next == '<') {
+            next = this -> input.get();
+            this -> character++;
+            if(next == '=') {
+                return token{tokenType::SMALLER_EQUALS, "<=", this -> line, this -> character - 2, this -> character};
+            } else {
+                this -> input.seekg(-1, std::ios::cur);
+                this -> character--;
+                return token{tokenType::SMALLER, "<", this -> line, this -> character - 1, this -> character};
+            }
+            
+        } else if(next == '!') {
+            next = this -> input.get();
+            this -> character++;
+            if(next == '=') {
+                return token{tokenType::NOT_EQUALS, "!=", this -> line, this -> character - 2, this -> character};
+            } else {
+                this -> input.seekg(-1, std::ios::cur);
+                this -> character--;
+                return token{tokenType::NOT, "!", this -> line, this -> character - 1, this -> character};
+            }     
         }
     }
 
