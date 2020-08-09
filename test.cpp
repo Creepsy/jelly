@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "src/jelly_lexer.h"
+#include "src/jelly_parser.h"
 
 int main() {
     std::ifstream test{};

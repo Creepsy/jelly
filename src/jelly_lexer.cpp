@@ -1,7 +1,5 @@
 #include "jelly_lexer.h"
 
-#include <iostream>
-
 jelly::jelly_lexer::jelly_lexer(std::istream& input) : input(input), line(0), character(0) {
 }
 
