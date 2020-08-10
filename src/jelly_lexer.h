@@ -113,6 +113,8 @@ namespace jelly {
         size_t line;
         size_t begin;
         size_t end;
+
+        std::string get_position();
     };
 
     class jelly_lexer {

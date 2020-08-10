@@ -42,7 +42,7 @@ jelly::token jelly::jelly_lexer::next_token() {
                         if(start_end) start_end = false;
                     }
                 }
-                if(this -> input.fail()) throw std::runtime_error("Expected comment end \'##\', found EOF");
+                if(this -> input.fail()) throw std::runtime_error("[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->character - 1) + "] " + "Expected comment end \'##\', found EOF");
                 return this -> next_token();
             } else {
                 while(next != '\n' && !this -> input.fail()) {
@@ -53,7 +53,7 @@ jelly::token jelly::jelly_lexer::next_token() {
                     this -> character = 0;
                     this -> line++;
                 } else {
-                    return token{tokenType::END, "END", this -> line, this -> character - 1, this -> character};
+                    return token{tokenType::END, "END", this->line, this->character - 1, this->character};
                 }
                 return this -> next_token();
             }
@@ -195,7 +195,7 @@ jelly::token jelly::jelly_lexer::next_number(const char curr) {
     if(curr == '.') is_float = true;
 
     while(!this -> input.fail() && (std::isdigit(next) || next == '.')) {
-        if(is_float && next == '.') throw std::runtime_error("Number parse error at Ln " + std::to_string(line) + ", Col " + std::to_string(this -> character - 1));
+        if(is_float && next == '.') throw std::runtime_error("[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->character - 1) + "] " + "Number parse error!");
         if(next == '.') is_float = true;
         number.push_back(next);
 
@@ -248,4 +248,8 @@ jelly::tokenType jelly::jelly_lexer::check_keywords(const std::string& ident) {
 }
 
 jelly::jelly_lexer::~jelly_lexer() {
+}
+
+std::string jelly::token::get_position() {
+    return "[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->begin) + "]";
 }
