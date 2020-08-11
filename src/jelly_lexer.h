@@ -6,6 +6,7 @@
 
 namespace jelly {
     const std::vector<std::string> tokenToString = {
+        "STRING",
         "FLOAT",
         "INT",
         "MULTIPLY",
@@ -23,7 +24,6 @@ namespace jelly {
         "OR",
         "AND",
         "SEPARATOR",
-        "QUOTE",
         "ASSIGN",
         "NOT",
         "GREATER",
@@ -57,6 +57,7 @@ namespace jelly {
     };
 
     enum tokenType {
+        STRING,
         FLOAT,
         INT,
         MULTIPLY,
@@ -74,7 +75,6 @@ namespace jelly {
         OR,
         AND,
         SEPARATOR,
-        QUOTE,
         ASSIGN,
         NOT,
         GREATER,
@@ -125,6 +125,7 @@ namespace jelly {
         size_t character;
 
         token next_number(const char curr);
+        token next_string();
         tokenType check_keywords(const std::string& ident);
     public:
         jelly_lexer(std::istream& input);

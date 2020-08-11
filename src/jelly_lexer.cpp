@@ -60,6 +60,7 @@ jelly::token jelly::jelly_lexer::next_token() {
         }
 
         if(std::isdigit(next) || next == '.') return this -> next_number(next);
+        if(next == '\"') return this -> next_string();
 
         if(next == '*') {
             return token{tokenType::MULTIPLY, "*", this -> line, this -> character - 1, this -> character};
@@ -107,8 +108,6 @@ jelly::token jelly::jelly_lexer::next_token() {
             return token{tokenType::AND, "&", this -> line, this -> character - 1, this -> character};
         } else if(next == ',') {
             return token{tokenType::SEPARATOR, ",", this -> line, this -> character - 1, this -> character};
-        } else if(next == '"') {
-            return token{tokenType::QUOTE, "\"", this -> line, this -> character - 1, this -> character};
         } else if(next == '=') {
             next = this -> input.get();
             this -> character++;
@@ -207,6 +206,61 @@ jelly::token jelly::jelly_lexer::next_number(const char curr) {
     this -> character--;
 
     return (is_float) ? token{tokenType::FLOAT, number, line, start, this -> character} : token{tokenType::INT, number, line, start, this -> character};
+}
+
+jelly::token jelly::jelly_lexer::next_string() {
+    std::string data = "";
+
+    size_t start_line = this -> line;
+    size_t start = this -> character - 1;
+
+    char curr = this -> input.get();
+    this -> character++;
+
+    while(curr != '\"' && !this -> input.fail()) {
+        if(curr == '\\') {
+            char next = this -> input.get();
+            if(!(next == 'n' || next == 't' || next == 'b' || next == 'r' || next == 'f' || next == '\"' || next == '\\'))
+                throw std::runtime_error("[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->character - 1) + "]" + "Expected one of the following: [n, t, b, r, f, \", \\], found " + next);
+            switch(next) {
+                case 'n':
+                    data.push_back('\n');
+                    break;
+                case 't':
+                    data.push_back('\t');
+                    break;
+                case 'b':
+                    data.push_back('\b');
+                    break;
+                case 'r':
+                    data.push_back('\r');
+                    break;
+                case 'f':
+                    data.push_back('\f');
+                    break;
+                case '\"':
+                    data.push_back('\"');
+                    break;
+                case '\\': 
+                    data.push_back('\\');
+                    break;
+            }
+        } else {
+            data.push_back(curr);
+        }
+        
+        if(curr == '\n') {
+            this -> character = 0;
+            this -> line++;
+        }
+        curr = this -> input.get();
+        this -> character++;
+    }
+
+    if(this -> input.fail()) 
+        throw std::runtime_error("[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->character - 1) + "] " + "Expected string end \'\"\', found EOF");
+
+    return token{tokenType::STRING, data, line, start, this -> character};
 }
 
 jelly::tokenType jelly::jelly_lexer::check_keywords(const std::string& ident) {

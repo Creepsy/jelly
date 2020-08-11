@@ -50,7 +50,7 @@ jelly::branch* jelly::jelly_parser::parse_multiplication() {
 }
 
 jelly::branch* jelly::jelly_parser::parse_value() {
-    if(this->accept({tokenType::INT, tokenType::FLOAT})) {
+    if(this->accept({tokenType::INT, tokenType::FLOAT, tokenType::STRING, tokenType::TRUE, tokenType::FALSE})) {
         const_expression* value = new const_expression{this->next.typ, this->next.identifier};
         this->consume();
         return value;
