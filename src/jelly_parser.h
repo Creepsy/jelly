@@ -20,6 +20,9 @@ namespace jelly {
             branch* parse_multiplication();
             branch* parse_value();
             branch* parse_parenthesis();
+            branch* parse_comparison();
+            branch* parse_equation();
+            branch* parse_unary();
         public:
             jelly_parser(jelly_lexer& lexer);
             branch* parse();

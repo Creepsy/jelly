@@ -14,7 +14,7 @@ void jelly::jelly_parser::consume() {
 
 jelly::branch* jelly::jelly_parser::parse() {
     consume();
-    return this->parse_sum();
+    return this->parse_equation();
 }
 
 jelly::branch* jelly::jelly_parser::parse_sum() {
@@ -34,12 +34,12 @@ jelly::branch* jelly::jelly_parser::parse_sum() {
 }
 
 jelly::branch* jelly::jelly_parser::parse_multiplication() {
-    branch* left = this->parse_parenthesis();
+    branch* left = this->parse_unary();
     while(true){
         if(this->accept({tokenType::MULTIPLY, tokenType::DIVIDE})) {
             tokenType op = this->next.typ;
             this->consume();
-            branch* right = this->parse_parenthesis();
+            branch* right = this->parse_unary();
             left = new binary_expression{left, right, op};
         } else {
             break;
@@ -62,12 +62,54 @@ jelly::branch* jelly::jelly_parser::parse_value() {
 jelly::branch* jelly::jelly_parser::parse_parenthesis() {
     if(this->accept(tokenType::O_BRACKET)) {
         this->consume();
-        branch* content = this->parse_sum();
+        branch* content = this->parse_equation();
         this->expect(tokenType::C_BRACKET);
         this->consume();
         return content;
     }
     return this->parse_value();
+}
+
+jelly::branch* jelly::jelly_parser::parse_comparison() {
+    branch* left = this->parse_sum();
+    while(true){
+        if(this->accept({tokenType::GREATER, tokenType::SMALLER, tokenType::GREATER_EQUALS, tokenType::SMALLER_EQUALS})) {
+            tokenType op = this->next.typ;
+            this->consume();
+            branch* right = this->parse_sum();
+            left = new binary_expression{left, right, op};
+        } else {
+            break;
+        }
+    }
+
+    return left;
+}
+
+jelly::branch* jelly::jelly_parser::parse_equation() {
+    branch* left = this->parse_comparison();
+    while(true){
+        if(this->accept({tokenType::EQUALS, tokenType::NOT_EQUALS})) {
+            tokenType op = this->next.typ;
+            this->consume();
+            branch* right = this->parse_comparison();
+            left = new binary_expression{left, right, op};
+        } else {
+            break;
+        }
+    }
+
+    return left;
+}
+
+jelly::branch* jelly::jelly_parser::parse_unary(){
+    if(this->accept({tokenType::ADD, tokenType::SUBSTRACT, tokenType::NOT})) {
+        tokenType t = this->next.typ;
+        this->consume();
+        return new unary_expression{t, this->parse_unary()};
+    }
+
+    return this->parse_parenthesis();
 }
 
 bool jelly::jelly_parser::accept(tokenType type) {

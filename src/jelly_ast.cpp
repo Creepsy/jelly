@@ -28,3 +28,14 @@ jelly::const_expression::~const_expression() {
 std::string jelly::const_expression::to_string() {
     return tokenToString[this->typ] + " : " + this->value;
 }
+
+jelly::unary_expression::unary_expression(tokenType sign, branch* value) : sign(sign), value(value) {
+
+}
+jelly::unary_expression::~unary_expression() {
+    delete this->value;
+}
+
+std::string jelly::unary_expression::to_string() {
+    return tokenToString[this->sign] + " : [" + this->value->to_string() + "]";
+}

@@ -34,4 +34,14 @@ namespace jelly {
             std::string to_string() override;
             ~const_expression();
     };
+
+    class unary_expression : public branch {
+        public:
+            tokenType sign;
+            branch* value;
+
+            unary_expression(tokenType sign, branch* value);
+            std::string to_string() override;
+            ~unary_expression();
+    };
 }
