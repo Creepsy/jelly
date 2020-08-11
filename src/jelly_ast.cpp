@@ -26,5 +26,5 @@ jelly::const_expression::~const_expression() {
 }
 
 std::string jelly::const_expression::to_string() {
-    return this -> value;
+    return tokenToString[this->typ] + " : " + this->value;
 }

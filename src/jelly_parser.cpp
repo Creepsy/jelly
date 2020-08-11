@@ -14,16 +14,16 @@ void jelly::jelly_parser::consume() {
 
 jelly::branch* jelly::jelly_parser::parse() {
     consume();
-    return this->parseSum();
+    return this->parse_sum();
 }
 
-jelly::branch* jelly::jelly_parser::parseSum() {
-    branch* left = this->parseMultiplication();
+jelly::branch* jelly::jelly_parser::parse_sum() {
+    branch* left = this->parse_multiplication();
     while(true){
         if(this->accept({tokenType::ADD, tokenType::SUBSTRACT})) {
             tokenType op = this->next.typ;
             this->consume();
-            branch* right = this->parseMultiplication();
+            branch* right = this->parse_multiplication();
             left = new binary_expression{left, right, op};
         } else {
             break;
@@ -33,13 +33,13 @@ jelly::branch* jelly::jelly_parser::parseSum() {
     return left;
 }
 
-jelly::branch* jelly::jelly_parser::parseMultiplication() {
-    branch* left = this->parseValue();
+jelly::branch* jelly::jelly_parser::parse_multiplication() {
+    branch* left = this->parse_parenthesis();
     while(true){
         if(this->accept({tokenType::MULTIPLY, tokenType::DIVIDE})) {
             tokenType op = this->next.typ;
             this->consume();
-            branch* right = this->parseValue();
+            branch* right = this->parse_parenthesis();
             left = new binary_expression{left, right, op};
         } else {
             break;
@@ -49,14 +49,25 @@ jelly::branch* jelly::jelly_parser::parseMultiplication() {
     return left;
 }
 
-jelly::branch* jelly::jelly_parser::parseValue() {
+jelly::branch* jelly::jelly_parser::parse_value() {
     if(this->accept({tokenType::INT, tokenType::FLOAT})) {
         const_expression* value = new const_expression{this->next.typ, this->next.identifier};
         this->consume();
         return value;
     } else {
-        throw std::runtime_error(this->next.get_position() + " Expected an value!");
+        throw std::runtime_error(this->next.get_position() + " Expected a value!");
     }
+}
+
+jelly::branch* jelly::jelly_parser::parse_parenthesis() {
+    if(this->accept(tokenType::O_BRACKET)) {
+        this->consume();
+        branch* content = this->parse_sum();
+        this->expect(tokenType::C_BRACKET);
+        this->consume();
+        return content;
+    }
+    return this->parse_value();
 }
 
 bool jelly::jelly_parser::accept(tokenType type) {

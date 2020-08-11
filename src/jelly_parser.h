@@ -16,9 +16,10 @@ namespace jelly {
             bool accept(const std::vector<tokenType>& type);
             void expect(tokenType type);
             void expect(const std::vector<tokenType>& type);
-            branch* parseSum();
-            branch* parseMultiplication();
-            branch* parseValue();
+            branch* parse_sum();
+            branch* parse_multiplication();
+            branch* parse_value();
+            branch* parse_parenthesis();
         public:
             jelly_parser(jelly_lexer& lexer);
             branch* parse();
