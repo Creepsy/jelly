@@ -14,7 +14,7 @@ void jelly::jelly_parser::consume() {
 
 jelly::branch* jelly::jelly_parser::parse() {
     consume();
-    return this->parse_equation();
+    return this->parse_statement();
 }
 
 jelly::branch* jelly::jelly_parser::parse_sum() {
@@ -114,6 +114,72 @@ jelly::branch* jelly::jelly_parser::parse_unary(){
     }
 
     return this->parse_parenthesis();
+}
+
+jelly::branch* jelly::jelly_parser::parse_statement() {
+    if(this->accept({tokenType::TYPE_BOOL, tokenType::TYPE_FLOAT, tokenType::TYPE_INT, tokenType::TYPE_STRING})) {
+        return this -> parse_define_statement();
+    } else if(this->accept(tokenType::IDENTIFIER)) {
+        return this -> parse_assign_statement();
+    } else {
+        branch* eq = this->parse_equation();
+        expect(tokenType::EOL);
+        consume();
+        return eq;
+        //throw std::runtime_error(this->next.get_position() + " Statement parse error!");
+    }
+}
+
+jelly::branch* jelly::jelly_parser::parse_assign_statement() {
+    std::string identifier = this->next.identifier;
+    this->consume();
+    if(accept(tokenType::IDENTIFIER)) {
+        return this -> parse_struct_define_statement(identifier);
+    } else {
+        expect(tokenType::ASSIGN);
+        consume();
+        branch* value = this->parse_equation();
+        expect(tokenType::EOL);
+        consume();
+        return new assign_statement{identifier, value};
+    }
+}
+
+jelly::branch* jelly::jelly_parser::parse_define_statement() {
+    tokenType typ = this->next.typ;
+    consume();
+    expect(tokenType::IDENTIFIER);
+    std::string identifier = this->next.identifier;
+    consume();
+
+    if(accept(tokenType::ASSIGN)) {
+        consume();
+        branch* value = this -> parse_equation();
+        expect(tokenType::EOL);
+        consume();
+        return new initialize_statement{identifier, typ, value};
+    } else {
+        expect(tokenType::EOL);
+        consume();
+        return new define_statement{identifier, typ};
+    }
+}
+
+jelly::branch* jelly::jelly_parser::parse_struct_define_statement(std::string struct_type) {
+    std::string identifier = this->next.identifier;
+    consume();
+
+    if(accept(tokenType::ASSIGN)) {
+        consume();
+        branch* value = this -> parse_equation();
+        expect(tokenType::EOL);
+        consume();
+        return new struct_initialize_statement{identifier, struct_type, value};
+    } else {
+        expect(tokenType::EOL);
+        consume();
+        return new struct_define_statement{identifier, struct_type};
+    }
 }
 
 bool jelly::jelly_parser::accept(tokenType type) {

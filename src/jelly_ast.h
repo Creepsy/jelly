@@ -53,4 +53,56 @@ namespace jelly {
             std::string to_string() override;
             ~variable_expression();
     };
+
+    class assign_statement : public branch {
+        public:
+            std::string identifier;
+            branch* value;
+
+            assign_statement(std::string identifier, branch* value);
+            std::string to_string() override;
+            ~assign_statement();
+    };
+
+    class define_statement : public branch {
+        public:
+            std::string identifier;
+            tokenType typ;
+
+            define_statement(std::string identifier, tokenType typ);
+            std::string to_string() override;
+            ~define_statement();
+    };
+
+    class initialize_statement : public branch {
+        public:
+            std::string identifier;
+            tokenType typ;
+            branch* value;
+
+            initialize_statement(std::string identifier, tokenType typ, branch* value);
+            std::string to_string() override;
+            ~initialize_statement();
+    };
+
+    class struct_define_statement : public branch {
+        public:
+            std::string identifier;
+            std::string struct_type;
+
+            struct_define_statement(std::string identifier, std::string struct_type);
+            std::string to_string() override;
+            ~struct_define_statement();
+    };
+
+    class struct_initialize_statement : public branch {
+        public:
+            std::string identifier;
+            std::string struct_type;
+            branch* value;
+
+            struct_initialize_statement(std::string identifier, std::string struct_type, branch* value);
+            std::string to_string() override;
+            ~struct_initialize_statement();
+    };
 }

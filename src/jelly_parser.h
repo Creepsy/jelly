@@ -23,6 +23,10 @@ namespace jelly {
             branch* parse_comparison();
             branch* parse_equation();
             branch* parse_unary();
+            branch* parse_statement();
+            branch* parse_assign_statement();
+            branch* parse_define_statement();
+            branch* parse_struct_define_statement(std::string struct_type);
         public:
             jelly_parser(jelly_lexer& lexer);
             branch* parse();
