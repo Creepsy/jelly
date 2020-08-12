@@ -39,3 +39,15 @@ jelly::unary_expression::~unary_expression() {
 std::string jelly::unary_expression::to_string() {
     return tokenToString[this->sign] + " : [" + this->value->to_string() + "]";
 }
+
+jelly::variable_expression::variable_expression(std::string identifier) : identifier(identifier) {
+
+}
+
+std::string jelly::variable_expression::to_string() {
+    return "Variable: " + this -> identifier;
+}
+
+jelly::variable_expression::~variable_expression() {
+
+}

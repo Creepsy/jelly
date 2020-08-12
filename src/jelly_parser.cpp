@@ -54,6 +54,10 @@ jelly::branch* jelly::jelly_parser::parse_value() {
         const_expression* value = new const_expression{this->next.typ, this->next.identifier};
         this->consume();
         return value;
+    } else if(this->accept(tokenType::IDENTIFIER)) {
+        variable_expression* value = new variable_expression{this->next.identifier};
+        this->consume();
+        return value;
     } else {
         throw std::runtime_error(this->next.get_position() + " Expected a value!");
     }

@@ -215,11 +215,12 @@ jelly::token jelly::jelly_lexer::next_string() {
     size_t start = this -> character - 1;
 
     char curr = this -> input.get();
-    this -> character++;
+    this->character++;
 
     while(curr != '\"' && !this -> input.fail()) {
         if(curr == '\\') {
             char next = this -> input.get();
+            this->character++;
             if(!(next == 'n' || next == 't' || next == 'b' || next == 'r' || next == 'f' || next == '\"' || next == '\\'))
                 throw std::runtime_error("[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->character - 1) + "]" + "Expected one of the following: [n, t, b, r, f, \", \\], found " + next);
             switch(next) {

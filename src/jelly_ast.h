@@ -44,4 +44,13 @@ namespace jelly {
             std::string to_string() override;
             ~unary_expression();
     };
+
+    class variable_expression : public branch {
+        public:
+            std::string identifier;
+
+            variable_expression(std::string identifier);
+            std::string to_string() override;
+            ~variable_expression();
+    };
 }
