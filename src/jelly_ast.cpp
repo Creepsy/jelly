@@ -111,3 +111,33 @@ std::string jelly::struct_initialize_statement::to_string() {
 jelly::struct_initialize_statement::~struct_initialize_statement() {
     delete this->value;
 }
+
+jelly::struct_instance_expression::struct_instance_expression(std::string struct_type, branch* initializer_list) : struct_type(struct_type), initializer_list(initializer_list) {
+
+}
+
+std::string jelly::struct_instance_expression::to_string() {
+    return "Struct instance of " + this->struct_type + ", Args: " + this->initializer_list->to_string();
+}
+
+jelly::struct_instance_expression::~struct_instance_expression() {
+    delete this->initializer_list;
+}
+
+jelly::list_expression::list_expression(std::vector<branch*> elements, size_t length) : elements(elements), length(length) {
+
+}
+
+std::string jelly::list_expression::to_string() {
+    std::string list = "Size: " + std::to_string(this->length) + ", {";
+    for(int i = 0; i < this->elements.size(); i++) {
+        if(i != 0) list += ", ";
+        list += this->elements.at(i)->to_string();
+    }
+
+    return list + "}";
+}
+
+jelly::list_expression::~list_expression() {
+    for(branch* b : this->elements) delete b;
+}

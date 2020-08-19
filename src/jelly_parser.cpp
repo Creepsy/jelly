@@ -58,6 +58,8 @@ jelly::branch* jelly::jelly_parser::parse_value() {
         variable_expression* value = new variable_expression{this->next.identifier};
         this->consume();
         return value;
+    } else if(this->accept(tokenType::O_BRACE)) {
+        return this->parse_list();
     } else {
         throw std::runtime_error(this->next.get_position() + " Expected a value!");
     }
@@ -165,13 +167,44 @@ jelly::branch* jelly::jelly_parser::parse_define_statement() {
     }
 }
 
+jelly::branch* jelly::jelly_parser::parse_list() {
+    expect(tokenType::O_BRACE);
+    consume();
+    std::vector<branch*> values;
+
+    while(true) {
+        try {
+            branch* value = this->parse_value();
+            values.push_back(value);
+            expect(tokenType::SEPARATOR);
+            consume();
+        } catch(std::runtime_error& e) {
+            break;
+        }
+    }
+
+    expect(tokenType::C_BRACE);
+    consume();
+
+    return new list_expression{values, values.size()};
+}
+
+jelly::branch* jelly::jelly_parser::parse_struct_instance() {
+    expect(tokenType::IDENTIFIER);
+    std::string struct_type = this->next.identifier;
+    consume();
+    branch* initializer_list = this->parse_list();
+
+    return new struct_instance_expression{struct_type, initializer_list};
+}
+
 jelly::branch* jelly::jelly_parser::parse_struct_define_statement(std::string struct_type) {
     std::string identifier = this->next.identifier;
     consume();
 
     if(accept(tokenType::ASSIGN)) {
         consume();
-        branch* value = this -> parse_equation();
+        branch* value = this -> parse_struct_instance();
         expect(tokenType::EOL);
         consume();
         return new struct_initialize_statement{identifier, struct_type, value};

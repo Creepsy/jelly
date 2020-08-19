@@ -27,6 +27,8 @@ namespace jelly {
             branch* parse_assign_statement();
             branch* parse_define_statement();
             branch* parse_struct_define_statement(std::string struct_type);
+            branch* parse_list();
+            branch* parse_struct_instance();
         public:
             jelly_parser(jelly_lexer& lexer);
             branch* parse();

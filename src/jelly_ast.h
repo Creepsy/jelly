@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "jelly_lexer.h"
 
@@ -104,5 +105,25 @@ namespace jelly {
             struct_initialize_statement(std::string identifier, std::string struct_type, branch* value);
             std::string to_string() override;
             ~struct_initialize_statement();
+    };
+
+    class struct_instance_expression : public branch {
+        public:
+            std::string struct_type;
+            branch* initializer_list;
+
+            struct_instance_expression(std::string struct_type, branch* initializer_list);
+            std::string to_string() override;
+            ~struct_instance_expression();
+    };
+
+    class list_expression : public branch {
+        public:
+            std::vector<branch*> elements;
+            size_t length;
+
+            list_expression(std::vector<branch*> elements, size_t length);
+            std::string to_string() override;
+            ~list_expression();
     };
 }
