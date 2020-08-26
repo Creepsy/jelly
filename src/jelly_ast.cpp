@@ -64,51 +64,29 @@ jelly::assign_statement::~assign_statement() {
     delete this->value;
 }
 
-jelly::define_statement::define_statement(std::string identifier, tokenType typ) : identifier(identifier), typ(typ) {
+jelly::define_statement::define_statement(std::string identifier, tokenType typ, std::string type_string)
+ : identifier(identifier), typ(typ), type_string(type_string) {
 
 }
 
 std::string jelly::define_statement::to_string() {
-    return "Define " + this->identifier + ", " + tokenToString[this->typ];
+    return "Define " + this->identifier + ", " + tokenToString[this->typ] + ", TypeString: " + this->type_string;
 }
 
 jelly::define_statement::~define_statement() {
 
 }
 
-jelly::initialize_statement::initialize_statement(std::string identifier, tokenType typ, branch* value) : identifier(identifier), typ(typ), value(value) {
+jelly::initialize_statement::initialize_statement(std::string identifier, tokenType typ, branch* value, std::string type_string)
+ : identifier(identifier), typ(typ), value(value), type_string(type_string) {
 
 }
 
 std::string jelly::initialize_statement::to_string() {
-    return "Initialize " + this->identifier + ", " + tokenToString[this->typ] + " with " + this->value->to_string();
+    return "Initialize " + this->identifier + ", " + tokenToString[this->typ] + " with " + this->value->to_string() + ", TypeString: " + this->type_string;
 }
 
 jelly::initialize_statement::~initialize_statement() {
-    delete this->value;
-}
-
-jelly::struct_define_statement::struct_define_statement(std::string identifier, std::string struct_type) : identifier(identifier), struct_type(struct_type) {
-
-}
-
-std::string jelly::struct_define_statement::to_string() {
-    return "Define struct " + this->identifier + ", " + this->struct_type;
-}
-
-jelly::struct_define_statement::~struct_define_statement() {
-
-}
-
-jelly::struct_initialize_statement::struct_initialize_statement(std::string identifier, std::string struct_type, branch* value) : identifier(identifier), struct_type(struct_type), value(value) {
-
-}
-
-std::string jelly::struct_initialize_statement::to_string() {
-    return "Initialize struct " + this->identifier + ", " + this->struct_type + " with " + this->value->to_string();
-}
-
-jelly::struct_initialize_statement::~struct_initialize_statement() {
     delete this->value;
 }
 
@@ -125,11 +103,10 @@ jelly::struct_instance_expression::~struct_instance_expression() {
 }
 
 jelly::list_expression::list_expression(std::vector<branch*> elements, size_t length) : elements(elements), length(length) {
-
 }
 
 std::string jelly::list_expression::to_string() {
-    std::string list = "Size: " + std::to_string(this->length) + ", {";
+    std::string list = "Array, Size: " + std::to_string(this->length) + ", {";
     for(int i = 0; i < this->elements.size(); i++) {
         if(i != 0) list += ", ";
         list += this->elements.at(i)->to_string();
