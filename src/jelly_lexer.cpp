@@ -16,6 +16,9 @@ jelly::token jelly::jelly_lexer::next_token() {
                 next = this -> input.get();
                 this -> character++;
             }
+            this -> input.seekg(-1, std::ios::cur);
+            this -> character--;
+            return this -> next_token();
         }
 
         if(next == '#') {
