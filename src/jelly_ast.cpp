@@ -102,11 +102,11 @@ jelly::struct_instance_expression::~struct_instance_expression() {
     delete this->initializer_list;
 }
 
-jelly::list_expression::list_expression(std::vector<branch*> elements, size_t length) : elements(elements), length(length) {
+jelly::list_expression::list_expression(std::vector<branch*> elements) : elements(elements) {
 }
 
 std::string jelly::list_expression::to_string() {
-    std::string list = "Array, Size: " + std::to_string(this->length) + ", {";
+    std::string list = "Array, Size: " + std::to_string(this->elements.size()) + ", {";
     for(int i = 0; i < this->elements.size(); i++) {
         if(i != 0) list += ", ";
         list += this->elements.at(i)->to_string();
@@ -117,4 +117,21 @@ std::string jelly::list_expression::to_string() {
 
 jelly::list_expression::~list_expression() {
     for(branch* b : this->elements) delete b;
+}
+
+jelly::block::block(std::vector<branch*> statements) : statements(statements) {
+
+}
+
+std::string jelly::block::to_string() {
+    std::string block_str = "";
+    for(branch* statement : this->statements) {
+        block_str += statement->to_string() + '\n';
+    }
+
+    return block_str;
+}
+
+jelly::block::~block() {
+    for(branch* b : this->statements) delete b;
 }

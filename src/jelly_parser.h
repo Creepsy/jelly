@@ -30,6 +30,7 @@ namespace jelly {
             branch* parse_list();
             branch* parse_struct_instance();
             branch* parse_array(std::string type_string);
+            branch* parse_block();
         public:
             jelly_parser(jelly_lexer& lexer);
             branch* parse();

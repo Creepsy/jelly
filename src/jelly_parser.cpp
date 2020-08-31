@@ -14,7 +14,7 @@ void jelly::jelly_parser::consume() {
 
 jelly::branch* jelly::jelly_parser::parse() {
     consume();
-    return this->parse_statement();
+    return this->parse_block();
 }
 
 jelly::branch* jelly::jelly_parser::parse_sum() {
@@ -63,6 +63,16 @@ jelly::branch* jelly::jelly_parser::parse_value() {
     } else {
         throw std::runtime_error(this->next.get_position() + " Expected a value!");
     }
+}
+
+jelly::branch* jelly::jelly_parser::parse_block() {
+    block* b = new block{{}};
+
+    while(!this->accept(tokenType::END)){
+        b->statements.push_back(this->parse_statement());
+    }
+
+    return b;
 }
 
 jelly::branch* jelly::jelly_parser::parse_parenthesis() {
@@ -202,7 +212,7 @@ jelly::branch* jelly::jelly_parser::parse_list() {
 
     while(true) {
         try {
-            branch* value = this->parse_value();
+            branch* value = this->parse_equation();
             values.push_back(value);
             expect(tokenType::SEPARATOR);
             consume();
@@ -214,7 +224,7 @@ jelly::branch* jelly::jelly_parser::parse_list() {
     expect(tokenType::C_BRACE);
     consume();
 
-    return new list_expression{values, values.size()};
+    return new list_expression{values};
 }
 
 jelly::branch* jelly::jelly_parser::parse_struct_instance() {

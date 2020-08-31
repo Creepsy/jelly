@@ -101,10 +101,18 @@ namespace jelly {
     class list_expression : public branch {
         public:
             std::vector<branch*> elements;
-            size_t length;
 
-            list_expression(std::vector<branch*> elements, size_t length);
+            list_expression(std::vector<branch*> elements);
             std::string to_string() override;
             ~list_expression();
+    };
+
+    class block : public branch {
+        public:
+            std::vector<branch*> statements;
+
+            block(std::vector<branch*> statements);
+            std::string to_string() override;
+            ~block();
     };
 }
