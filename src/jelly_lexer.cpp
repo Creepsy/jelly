@@ -16,8 +16,17 @@ token jelly_lexer::next_token() {
         token op = this->get_operator(next);
         if(op.typ != token_type::NONE) return op;
 
+        if(next == '#') {
+            this->consume_comment();
+            return this->next_token();
+        }
+
         if(next == '.' || std::isdigit(next)) {
             return this->get_number(next);
+        }
+
+        if(next == '"') {
+            return this->get_string();
         }
 
         if(std::isalpha(next) || next == '_') {
@@ -209,4 +218,66 @@ token_type jelly_lexer::get_keyword(std::string ident) {
     }
 
     return token_type::IDENTIFIER;
+}
+
+void jelly_lexer::consume_comment() {
+    char next;
+    do {
+        next = this->next_chr();
+        if(next == '\n') {
+            this->chr = 0;
+            this->line++;
+        }
+    } while(next != '#' && !this->inp.fail());
+    if(this->inp.fail()) this->throw_error("Expected comment end, but found EOF!");
+}
+
+token jelly_lexer::get_string() {
+    size_t start_chr = this->chr - 1, start_line = this->line;
+    std::string content;
+
+    char next = this->next_chr();
+    while(next != '"' && !this->inp.fail()) {
+        if(next == '\n') {
+            this->chr = 0;
+            this->line++;
+        }
+
+        if(next == '\\') {
+            next = this->next_chr();
+            if(!(next == 'n' || next == 't' || next == 'b' || next == 'r' || next == 'f' || next == '\"' || next == '\\')) {
+                this->throw_error("Expected one of the following: { n, t, b, r, f, \", \\ }, found " + std::string(1, next));
+            }
+            switch(next) {
+                case 'n':
+                    content += '\n';
+                    break;
+                case 't':
+                    content += '\t';
+                    break;
+                case 'b':
+                    content += '\b';
+                    break;
+                case 'r':
+                    content += '\r';
+                    break;
+                case 'f':
+                    content += '\f';
+                    break;
+                case '\"':
+                    content += '\"';
+                    break;
+                case '\\': 
+                    content += '\\';
+                    break;
+            }
+        } else {
+            content += next;
+        }
+        
+        next = this->next_chr();
+    }
+    if(this->inp.fail()) this->throw_error("Expected string end, found EOF");
+
+    return token{ token_type::STRING, content, start_line, start_chr, this->line, this->chr };
 }

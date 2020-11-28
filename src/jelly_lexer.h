@@ -20,6 +20,8 @@ class jelly_lexer {
         void throw_error(std::string err);
         std::string get_identifier(char next);
         jelly_tokens::token_type get_keyword(std::string ident);
+        void consume_comment();
+        jelly_tokens::token get_string();
     public:
         jelly_lexer(std::ifstream& inp);
         jelly_tokens::token next_token();

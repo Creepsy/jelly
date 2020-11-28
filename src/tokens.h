@@ -56,6 +56,7 @@ namespace jelly_tokens {
         BREAK,
         RETURN,
         IMPORT,
+        STRING,
         END_OF_FILE,
         NONE
     };
