@@ -23,8 +23,10 @@ token jelly_lexer::next_token() {
         if(std::isalpha(next) || next == '_') {
             size_t start_chr = this->chr - 1, start_line = this->line;
             std::string ident = this->get_identifier(next);
-            return token{ token_type::IDENTIFIER, ident, start_line, start_chr, this->line, this->chr };
+            return token{ this->get_keyword(ident), ident, start_line, start_chr, this->line, this->chr };
         }
+
+        return token{ token_type::NONE, "NONE", this->line, this->chr - 1, this->line, this->chr };
     }
 
     return token{ token_type::END_OF_FILE, "EOF", this->line, this->chr - 1, this->line, this->chr };
@@ -71,11 +73,13 @@ token jelly_lexer::get_operator(char next) {
         case '+':
             next = this->next_chr();
             if(next == '=') return token{ token_type::ADD_ASSIGN, "+=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '+') return token{ token_type::INCR, "++", this->line, this->chr - 2, this->line, this->chr };
             this->prev_chr();
             return token{ token_type::ADD, "+", this->line, this->chr - 1, this->line, this->chr };
         case '-':
             next = this->next_chr();
             if(next == '=') return token{ token_type::SUB_ASSIGN, "-=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '-') return token{ token_type::DECR, "--", this->line, this->chr - 2, this->line, this->chr };
             this->prev_chr();
             return token{ token_type::SUB, "-", this->line, this->chr - 1, this->line, this->chr };
         case '*':
@@ -172,5 +176,37 @@ std::string jelly_lexer::get_identifier(char next) {
 }
 
 token_type jelly_lexer::get_keyword(std::string ident) {
-    return token_type::NONE;
+    if(ident == "int") {
+        return token_type::INT_IDENT;
+    } else if(ident == "float") {
+        return token_type::FLOAT_IDENT;
+    } else if(ident == "array") {
+        return token_type::ARRAY_IDENT;
+    } else if(ident == "string") {
+        return token_type::STRING_IDENT;
+    } else if(ident == "bool") {
+        return token_type::BOOL_IDENT;
+    } else if(ident == "func") {
+        return token_type::FUNC;
+    } else if(ident == "if") {
+        return token_type::IF;
+    } else if(ident == "else") {
+        return token_type::ELSE;
+    } else if(ident == "for") {
+        return token_type::FOR;
+    } else if(ident == "break") {
+        return token_type::BREAK;
+    } else if(ident == "while") {
+        return token_type::WHILE;
+    } else if(ident == "return") {
+        return token_type::RETURN;
+    } else if(ident == "import") {
+        return token_type::IMPORT;
+    } else if(ident == "true") {
+        return token_type::TRUE;
+    } else if(ident == "false") {
+        return token_type::FALSE;
+    }
+
+    return token_type::IDENTIFIER;
 }
