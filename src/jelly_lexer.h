@@ -18,6 +18,8 @@ class jelly_lexer {
         jelly_tokens::token get_operator(char next);
         jelly_tokens::token get_number(char next);
         void throw_error(std::string err);
+        std::string get_identifier(char next);
+        jelly_tokens::token_type get_keyword(std::string ident);
     public:
         jelly_lexer(std::ifstream& inp);
         jelly_tokens::token next_token();

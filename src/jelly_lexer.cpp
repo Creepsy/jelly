@@ -19,6 +19,12 @@ token jelly_lexer::next_token() {
         if(next == '.' || std::isdigit(next)) {
             return this->get_number(next);
         }
+
+        if(std::isalpha(next) || next == '_') {
+            size_t start_chr = this->chr - 1, start_line = this->line;
+            std::string ident = this->get_identifier(next);
+            return token{ token_type::IDENTIFIER, ident, start_line, start_chr, this->line, this->chr };
+        }
     }
 
     return token{ token_type::END_OF_FILE, "EOF", this->line, this->chr - 1, this->line, this->chr };
@@ -151,4 +157,20 @@ token jelly_lexer::get_number(char next) {
 
 void jelly_lexer::throw_error(std::string err) {
     throw std::runtime_error("[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->chr) + "]: " + err);
+}
+
+std::string jelly_lexer::get_identifier(char next) {
+    std::string ident;
+
+    do {
+        ident += next;
+        next = this->next_chr();
+    } while(std::isalnum(next) || next == '_');
+    this->prev_chr();
+
+    return ident;
+}
+
+token_type jelly_lexer::get_keyword(std::string ident) {
+    return token_type::NONE;
 }
