@@ -245,9 +245,6 @@ token jelly_lexer::get_string() {
 
         if(next == '\\') {
             next = this->next_chr();
-            if(!(next == 'n' || next == 't' || next == 'b' || next == 'r' || next == 'f' || next == '\"' || next == '\\')) {
-                this->throw_error("Expected one of the following: { n, t, b, r, f, \", \\ }, found " + std::string(1, next));
-            }
             switch(next) {
                 case 'n':
                     content += '\n';
@@ -270,6 +267,8 @@ token jelly_lexer::get_string() {
                 case '\\': 
                     content += '\\';
                     break;
+                default:
+                    this->throw_error("Expected one of the following: { n, t, b, r, f, \", \\ }, found " + std::string(1, next));
             }
         } else {
             content += next;

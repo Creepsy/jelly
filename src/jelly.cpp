@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "jelly_lexer.h"
+#include "jelly_parser.h"
 
 int main() {
 
