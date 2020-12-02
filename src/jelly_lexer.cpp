@@ -2,7 +2,8 @@
 
 using namespace jelly_tokens;
 
-jelly_lexer::jelly_lexer(std::ifstream& inp) : inp(inp), chr(0), line(0) {
+jelly_lexer::jelly_lexer(std::ifstream& inp)
+ : inp(inp), chr(0), line(0) {
 }
 
 token jelly_lexer::next_token() {
