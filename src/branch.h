@@ -2,19 +2,14 @@
 
 #include <string>
 
-struct position {
-    size_t line_begin;
-    size_t chr_begin;
-
-    size_t line_end;
-    size_t chr_end;
-};
+#include "positional_types.h"
 
 class branch {
     private:
-        position pos;
+        sequence seq;
     public:
-        branch(position pos);
+        branch(sequence seq);
+        sequence get_sequence();
         virtual std::string to_string() = 0;
         virtual ~branch();
 };

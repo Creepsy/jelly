@@ -8,8 +8,7 @@ class jelly_lexer {
     private:
         std::ifstream& inp;
 
-        size_t line;
-        size_t chr;
+        position curr_pos;
 
         char next_chr();
         void prev_chr();

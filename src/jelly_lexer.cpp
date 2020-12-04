@@ -3,7 +3,7 @@
 using namespace jelly_tokens;
 
 jelly_lexer::jelly_lexer(std::ifstream& inp)
- : inp(inp), chr(0), line(0) {
+ : inp(inp), curr_pos{ position{ 0, 0 } } {
 }
 
 token jelly_lexer::next_token() {
@@ -31,15 +31,15 @@ token jelly_lexer::next_token() {
         }
 
         if(std::isalpha(next) || next == '_') {
-            size_t start_chr = this->chr - 1, start_line = this->line;
+            size_t start_chr = this->curr_pos.chr - 1, start_line = this->curr_pos.line;
             std::string ident = this->get_identifier(next);
-            return token{ this->get_keyword(ident), ident, start_line, start_chr, this->line, this->chr };
+            return token{ this->get_keyword(ident), ident, start_line, start_chr, this->curr_pos.line, this->curr_pos.chr };
         }
 
-        return token{ token_type::NONE, "NONE", this->line, this->chr - 1, this->line, this->chr };
+        return token{ token_type::NONE, "NONE", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
     }
 
-    return token{ token_type::END_OF_FILE, "EOF", this->line, this->chr - 1, this->line, this->chr };
+    return token{ token_type::END_OF_FILE, "EOF", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
 }
 
 jelly_lexer::~jelly_lexer() {
@@ -49,20 +49,20 @@ jelly_lexer::~jelly_lexer() {
 //private
 
 char jelly_lexer::next_chr() {
-    this->chr++;
+    this->curr_pos.chr++;
     return this->inp.get();
 }
 
 void jelly_lexer::prev_chr() {
     this->inp.seekg(-1, std::ios::cur);
-    this->chr--;
+    this->curr_pos.chr--;
 }
 
 void jelly_lexer::clear_wspace(char next) {
     while(std::isspace(next) && !this->inp.fail()) {
         if(next == '\n') {
-            this->chr = 0;
-            this->line++;
+            this->curr_pos.chr = 0;
+            this->curr_pos.line++;
         }
         next = this->next_chr();
     }
@@ -72,85 +72,85 @@ void jelly_lexer::clear_wspace(char next) {
 token jelly_lexer::get_operator(char next) {
     switch (next) {
         case '|':
-            return token{ token_type::OR, "|", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::OR, "|", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '&':
-            return token{ token_type::AND, "&", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::AND, "&", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '=':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::EQUALS, "==", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::EQUALS, "==", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::ASSIGN, "=", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::ASSIGN, "=", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '+':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::ADD_ASSIGN, "+=", this->line, this->chr - 2, this->line, this->chr };
-            if(next == '+') return token{ token_type::INCR, "++", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::ADD_ASSIGN, "+=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
+            if(next == '+') return token{ token_type::INCR, "++", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::ADD, "+", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::ADD, "+", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '-':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::SUB_ASSIGN, "-=", this->line, this->chr - 2, this->line, this->chr };
-            if(next == '-') return token{ token_type::DECR, "--", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::SUB_ASSIGN, "-=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
+            if(next == '-') return token{ token_type::DECR, "--", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::SUB, "-", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::SUB, "-", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '*':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::MUL_ASSIGN, "*=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::MUL_ASSIGN, "*=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::MUL, "*", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::MUL, "*", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '/':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::DIV_ASSIGN, "/=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::DIV_ASSIGN, "/=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::DIV, "/", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::DIV, "/", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '^':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::POW_ASSIGN, "^=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::POW_ASSIGN, "^=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::POW, "^", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::POW, "^", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '%':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::MOD_ASSIGN, "%=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::MOD_ASSIGN, "%=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::MOD, "%", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::MOD, "%", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '>':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::GREATER_EQ, ">=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::GREATER_EQ, ">=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::GREATER, ">", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::GREATER, ">", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '<':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::SMALLER_EQ, "<=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::SMALLER_EQ, "<=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::SMALLER, "<", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::SMALLER, "<", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '!':
             next = this->next_chr();
-            if(next == '=') return token{ token_type::NOT_EQ, "!=", this->line, this->chr - 2, this->line, this->chr };
+            if(next == '=') return token{ token_type::NOT_EQ, "!=", this->curr_pos.line, this->curr_pos.chr - 2, this->curr_pos.line, this->curr_pos.chr };
             this->prev_chr();
-            return token{ token_type::NOT, "!", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::NOT, "!", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case ',':
-            return token{ token_type::COMMA, ",", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::COMMA, ",", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case ';':
-            return token{ token_type::LINE_END, ";", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::LINE_END, ";", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '(':
-            return token{ token_type::BRACKET_OPEN, "(", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::BRACKET_OPEN, "(", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case ')':
-            return token{ token_type::BRACKET_CLOSE, ")", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::BRACKET_CLOSE, ")", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '{':
-            return token{ token_type::CUR_BRACKET_OPEN, "{", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::CUR_BRACKET_OPEN, "{", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '}':
-            return token{ token_type::CUR_BRACKET_CLOSE, "}", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::CUR_BRACKET_CLOSE, "}", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case '[':
-            return token{ token_type::SQ_BRACKET_OPEN, "[", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::SQ_BRACKET_OPEN, "[", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
         case ']':
-            return token{ token_type::SQ_BRACKET_CLOSE, "]", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::SQ_BRACKET_CLOSE, "]", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
             
         default:
-            return token{ token_type::NONE, "NONE", this->line, this->chr - 1, this->line, this->chr };
+            return token{ token_type::NONE, "NONE", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
     }
 }
 
 token jelly_lexer::get_number(char next) {
-    size_t start_chr = this->chr - 1, start_line = this->line;
+    size_t start_chr = this->curr_pos.chr - 1, start_line = this->curr_pos.line;
 
     bool is_float = false;
     std::string num;
@@ -166,11 +166,11 @@ token jelly_lexer::get_number(char next) {
     this->prev_chr();
 
     if(is_float && num.size() == 1) this->throw_error("InvalidNumberFormat - a number can't consist out of a single '.'!");
-    return token{ (is_float) ? token_type::FLOAT : token_type::INT, num, start_line, start_chr, this->line, this->chr };
+    return token{ (is_float) ? token_type::FLOAT : token_type::INT, num, start_line, start_chr, this->curr_pos.line, this->curr_pos.chr };
 }
 
 void jelly_lexer::throw_error(std::string err) {
-    throw std::runtime_error("[Ln " + std::to_string(this->line) + ", Col " + std::to_string(this->chr) + "]: " + err);
+    throw std::runtime_error("[Ln " + std::to_string(this->curr_pos.line) + ", Col " + std::to_string(this->curr_pos.chr) + "]: " + err);
 }
 
 std::string jelly_lexer::get_identifier(char next) {
@@ -226,22 +226,22 @@ void jelly_lexer::consume_comment() {
     do {
         next = this->next_chr();
         if(next == '\n') {
-            this->chr = 0;
-            this->line++;
+            this->curr_pos.chr = 0;
+            this->curr_pos.line++;
         }
     } while(next != '#' && !this->inp.fail());
     if(this->inp.fail()) this->throw_error("Expected comment end, but found EOF!");
 }
 
 token jelly_lexer::get_string() {
-    size_t start_chr = this->chr - 1, start_line = this->line;
+    size_t start_chr = this->curr_pos.chr - 1, start_line = this->curr_pos.line;
     std::string content;
 
     char next = this->next_chr();
     while(next != '"' && !this->inp.fail()) {
         if(next == '\n') {
-            this->chr = 0;
-            this->line++;
+            this->curr_pos.chr = 0;
+            this->curr_pos.line++;
         }
 
         if(next == '\\') {
@@ -279,5 +279,5 @@ token jelly_lexer::get_string() {
     }
     if(this->inp.fail()) this->throw_error("Expected string end, found EOF");
 
-    return token{ token_type::STRING, content, start_line, start_chr, this->line, this->chr };
+    return token{ token_type::STRING, content, start_line, start_chr, this->curr_pos.line, this->curr_pos.chr };
 }

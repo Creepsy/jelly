@@ -13,7 +13,7 @@ int main() {
     jelly_tokens::token t;
     do {
         t = lexer.next_token();
-        std::cout << t.typ << ", " << t.identifier << ", From: (" << t.line_begin << ", " << t.chr_begin << "), To: (" << t.line_end << ", " << t.chr_end << ")" << std::endl;
+        std::cout << t.typ << ", " << t.identifier << ", From: (" << t.seq.begin.line << ", " << t.seq.begin.chr << "), To: (" << t.seq.end.line << ", " << t.seq.end.chr << ")" << std::endl;
     } while(t.typ != jelly_tokens::token_type::END_OF_FILE);
 
     file.close();

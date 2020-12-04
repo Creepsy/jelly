@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+#include "positional_types.h"
+
 namespace jelly_tokens {
 
     enum token_type {
@@ -65,10 +67,6 @@ namespace jelly_tokens {
         token_type typ;
         std::string identifier;
 
-        size_t line_begin;
-        size_t chr_begin;
-
-        size_t line_end;
-        size_t chr_end;   
+        sequence seq;   
     };
 }
