@@ -3,7 +3,6 @@
 #include "jelly_parser.h"
 
 int main() {
-
     std::ifstream file;
     file.open("example.jelly");
     if(!file.is_open()) return -1;

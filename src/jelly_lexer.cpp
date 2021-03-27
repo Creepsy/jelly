@@ -42,6 +42,10 @@ token jelly_lexer::next_token() {
     return token{ token_type::END_OF_FILE, "EOF", this->curr_pos.line, this->curr_pos.chr - 1, this->curr_pos.line, this->curr_pos.chr };
 }
 
+position jelly_lexer::get_current_position() {
+    return this->curr_pos;
+}
+
 jelly_lexer::~jelly_lexer() {
 
 }
@@ -169,7 +173,7 @@ token jelly_lexer::get_number(char next) {
     return token{ (is_float) ? token_type::FLOAT : token_type::INT, num, start_line, start_chr, this->curr_pos.line, this->curr_pos.chr };
 }
 
-void jelly_lexer::throw_error(std::string err) {
+void jelly_lexer::throw_error(const std::string& err) {
     throw std::runtime_error("[Ln " + std::to_string(this->curr_pos.line) + ", Col " + std::to_string(this->curr_pos.chr) + "]: " + err);
 }
 
@@ -185,7 +189,7 @@ std::string jelly_lexer::get_identifier(char next) {
     return ident;
 }
 
-token_type jelly_lexer::get_keyword(std::string ident) {
+token_type jelly_lexer::get_keyword(const std::string& ident) {
     if(ident == "int") {
         return token_type::INT_IDENT;
     } else if(ident == "float") {

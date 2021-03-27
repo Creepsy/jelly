@@ -17,7 +17,10 @@ private:
 
     void expect(jelly_tokens::token_type type);
     void expect(const std::vector<jelly_tokens::token_type>& types);
+
+    void throw_error(const std::string& err);
 public:
     jelly_parser(jelly_lexer& lexer);
+    branch* parse();
     ~jelly_parser();
 };
